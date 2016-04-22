@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
@@ -11,21 +13,28 @@
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp" />
+        android:layout_marginLeft="8dp"
+        android:contentDescription="@string/artist_img" />
 
     <TextView
         android:id="@+id/artistListItemName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:text="Name of artist"
+        android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/artistListItemStyle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:text="Style"
+        android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/artistListItemWorks"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:text="Albums and songs count"
+        android:textSize="20sp"/>
 
 </RelativeLayout>
