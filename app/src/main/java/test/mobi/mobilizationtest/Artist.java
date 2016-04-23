@@ -2,19 +2,46 @@ package test.mobi.mobilizationtest;
 
 import android.media.Image;
 
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Created by daria on 22.04.16.
  */
 public class Artist {
     private long id;
     private String name;
-    private String style;
+    private List style;
     private int albums;
     private int songs;
     private String link;
     private String description;
     private String coverSmall;
     private String coverBig;
+
+    Artist(){
+        this.id = -1;
+        this.name = null;
+        this.style = null;
+        this.albums = -1;
+        this.songs = -1;
+        this.link = null;
+        this.description = null;
+        this.coverSmall = null;
+        this.coverBig = null;
+    }
+    Artist(long id, String name, List style, int albums, int songs, String link,
+           String description, String coverSmall, String coverBig){
+        this.id = id;
+        this.name = name;
+        this.style = style;
+        this.albums = albums;
+        this.songs = songs;
+        this.link = link;
+        this.description = description;
+        this.coverSmall = coverSmall;
+        this.coverBig = coverBig;
+    }
 
     public long getId() {
         return id;
@@ -30,10 +57,10 @@ public class Artist {
         this.name = name;
     }
 
-    public String getStyle() {
+    public List getStyle() {
         return style;
     }
-    public void setStyle(String style) {
+    public void setStyle(List style) {
         this.style = style;
     }
 

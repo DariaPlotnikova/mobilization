@@ -41,7 +41,7 @@ public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position) {
         Artist curArtist = artists.get(position);
         int imageId = 0;
-        holder.image.setImageResource(imageId);
+        holder.image.setImageResource(imageId);                                                     // ВЫБИРАТЬ НУЖНЫЙ ID КАРТИНКИ
         holder.name.setText(curArtist.getName());
         holder.style.setText(curArtist.getStyle());
         holder.works.setText(works_in_list);
