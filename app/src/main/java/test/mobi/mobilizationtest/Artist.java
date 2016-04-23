@@ -63,8 +63,9 @@ public class Artist {
     public String getStyleString() {
         String styles = "";
         for (String s : style){
-            styles += ", " + s;
+            styles += "\"" + s + "\",";
         }
+        styles = styles.substring(0, styles.length()-1);
         return styles;
     }
     public void setStyle(List style) {
@@ -127,7 +128,11 @@ public class Artist {
         return copyArtist;
     }
 
-    public String toString(){
-        return (this.id + "");
+    public String toJson(){
+        return ("{\"id\":"+this.id + ", \"name\":\""+this.name + "\", \"genres\":["+
+                this.getStyleString()+"], \"tracks\":"+this.songs + ", \"albums\":"+this.albums +
+                ",\"link\":\""+this.link + "\", \"description\":\""+this.description +
+                "\", \"cover\":{\"small\":\""+this.coverSmall + "\" ,\"big\":\""+this.coverBig+"\"}}");
     }
+
 }

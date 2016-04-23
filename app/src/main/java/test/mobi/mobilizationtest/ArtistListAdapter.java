@@ -41,24 +41,22 @@ public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position) {
         Artist curArtist = artists.get(position);
         int imageId = 0;
-        holder.image.setImageResource(imageId);                                                     // ВЫБИРАТЬ НУЖНЫЙ ID КАРТИНКИ
+       // holder.image.setImageResource(imageId);                                                     // ВЫБИРАТЬ НУЖНЫЙ ID КАРТИНКИ
         holder.name.setText(curArtist.getName());
         holder.style.setText(curArtist.getStyleString());
-        holder.works.setText(works_in_list);
+        holder.works.setText(curArtist.getSongs() + "песен");
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return artists.size();
     }
-
     private void copy(Artist artist){
         int position = artists.indexOf(artist);
         Artist copy = artist.copy();
         artists.add(position + 1, copy);
         notifyItemInserted(position + 1);
     }
-
     private void delete(Artist artist){
         int position = artists.indexOf(artist);
         artists.remove(position);
@@ -76,10 +74,19 @@ public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter.Vi
 
         public ViewHolder(View itemView) {
             super(itemView);
-            image = (ImageView) itemView.findViewById(id.artistListItemImage);
-            name = (TextView) itemView.findViewById(id.artistListItemName);
-            style = (TextView) itemView.findViewById(id.artistListItemStyle);
-            works = (TextView) itemView.findViewById(id.artistListItemWorks);
+            this.image = (ImageView) itemView.findViewById(id.artistListItemImage);
+            this.name = (TextView) itemView.findViewById(id.artistListItemName);
+            this.style = (TextView) itemView.findViewById(id.artistListItemStyle);
+            this.works = (TextView) itemView.findViewById(id.artistListItemWorks);
         }
+
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View itemView = LayoutInflater.
+                    from(viewGroup.getContext()).
+                    inflate(layout.artistlist_item, viewGroup, false);
+
+            return new ViewHolder(itemView);
+        }
+
     }
 }

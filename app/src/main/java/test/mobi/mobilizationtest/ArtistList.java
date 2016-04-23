@@ -2,18 +2,22 @@ package test.mobi.mobilizationtest;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.EventLogTags;
 import android.util.JsonReader;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.BufferedReader;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,7 +25,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ArtistList extends AppCompatActivity {
 
@@ -32,17 +35,17 @@ public class ArtistList extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-    /*    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-    */
+        List<Artist> artists = new ArrayList<Artist>();
+        RecyclerView recView = (RecyclerView)findViewById(R.id.artistListView);
+        ArtistListAdapter adapter = new ArtistListAdapter(artists);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
 
         new ParseTask().execute();
+
+        recView.setAdapter(adapter);
+        recView.setLayoutManager(layoutManager);
+        recView.setItemAnimator(itemAnimator);
 
     }
 
@@ -81,7 +84,7 @@ public class ArtistList extends AppCompatActivity {
             String resultJson = "";
 
             try {
-                URL url = new URL("download.cdn.yandex.net/mobilization-2016/artists.json");
+                URL url = new URL("http://download.cdn.yandex.net/mobilization-2016/artists.json");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -89,9 +92,10 @@ public class ArtistList extends AppCompatActivity {
                 InputStream inputStream = urlConnection.getInputStream();
                 JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
                 try {
-                    List<Artist> artists = readMessagesArray(reader);                                           // ПАРСИТЬ В СТРОКУ
+                    List<Artist> artists = readMessagesArray(reader);
                     for (Artist a : artists){
-                        resultJson += " " + a.getName();
+                        resultJson += a.toJson() + ", ";
+                        resultJson = resultJson.substring(0, resultJson.length()-2);    // Удаляет последнюю запятую
                     }
                 }
                 finally {
@@ -156,9 +160,9 @@ public class ArtistList extends AppCompatActivity {
                 } else {
                     reader.skipValue();
                 }
-                reader.endObject();
             }
-            return new Artist(id, name, style, songs, albums, link, description, coverSmall, coverBig);
+            reader.endObject();
+            return new Artist(id, name, style, albums, songs, link, description, coverSmall, coverBig);
         }
 
         /**
@@ -198,10 +202,35 @@ public class ArtistList extends AppCompatActivity {
         }
 
         /**
-         * Выводит JSON данные в активити
+         * Выводит JSON данные в главое активити (список)
          */
+        @Override
         protected void onPostExecute(String strJson){
+            super.onPostExecute(strJson);
 
+            JSONObject dataJson = null;
+            try{
+                dataJson = new JSONObject(strJson);
+                JSONArray artists = dataJson.getJSONArray("");
+                JSONObject artist = artists.getJSONObject(0);
+                String name = "Имечко";//artist.getString("name");
+                String style = "Стили";// artist.getString("genres");
+                int songs = 9;//artist.getInt("tracks");
+                int albums = 3;//artist.getInt("albums");
+
+                ImageView imgView = (ImageView) findViewById(R.id.artistListItemImage);
+                TextView nameView = (TextView) findViewById(R.id.artistListItemName);
+                TextView styleView = (TextView) findViewById(R.id.artistListItemStyle);
+                TextView worksView = (TextView) findViewById(R.id.artistListItemWorks);
+
+                nameView.setText(name);
+                styleView.setText(style);
+                worksView.setText(songs + " песен, " + albums + " альбомов");
+
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
         }
 
     }
