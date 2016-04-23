@@ -11,7 +11,7 @@ import java.util.Objects;
 public class Artist {
     private long id;
     private String name;
-    private List style;
+    private List<String> style;
     private int albums;
     private int songs;
     private String link;
@@ -59,6 +59,13 @@ public class Artist {
 
     public List getStyle() {
         return style;
+    }
+    public String getStyleString() {
+        String styles = "";
+        for (String s : style){
+            styles += ", " + s;
+        }
+        return styles;
     }
     public void setStyle(List style) {
         this.style = style;
@@ -118,5 +125,9 @@ public class Artist {
         copyArtist.setCoverSmall(coverSmall);
         copyArtist.setCoverBig(coverBig);
         return copyArtist;
+    }
+
+    public String toString(){
+        return (this.id + "");
     }
 }

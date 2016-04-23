@@ -43,7 +43,7 @@ public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter.Vi
         int imageId = 0;
         holder.image.setImageResource(imageId);                                                     // ВЫБИРАТЬ НУЖНЫЙ ID КАРТИНКИ
         holder.name.setText(curArtist.getName());
-        holder.style.setText(curArtist.getStyle());
+        holder.style.setText(curArtist.getStyleString());
         holder.works.setText(works_in_list);
     }
 

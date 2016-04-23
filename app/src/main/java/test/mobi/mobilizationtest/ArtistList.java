@@ -32,7 +32,7 @@ public class ArtistList extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    /*    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,6 +40,10 @@ public class ArtistList extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    */
+
+        new ParseTask().execute();
+
     }
 
     @Override
@@ -64,145 +68,142 @@ public class ArtistList extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ArtistParser {
 
-        private class ParseTask extends AsyncTask<Void, Void, String> {
+    private class ParseTask extends AsyncTask<Void, Void, String> {
 
-            HttpURLConnection urlConnection = null;
-         //   JsonReader reader = null;
+        HttpURLConnection urlConnection = null;
+
+        /**
+         * Получает JSON данные из внешнего источника
+         */
+        @Override
+        protected String doInBackground(Void... params) {
             String resultJson = "";
 
-            /**
-             * Получает JSON данные из внешнего источника
-             */
-            @Override
-            protected String doInBackground(Void... params) {
+            try {
+                URL url = new URL("download.cdn.yandex.net/mobilization-2016/artists.json");
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+                JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
                 try {
-                    URL url = new URL("download.cdn.yandex.net/mobilization-2016/artists.json");
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.connect();
-
-                    InputStream inputStream = urlConnection.getInputStream();
-                    JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-                    try {
-                        return readMessagesArray(reader);                                           // ПАРСИТЬ В СТРОКУ
+                    List<Artist> artists = readMessagesArray(reader);                                           // ПАРСИТЬ В СТРОКУ
+                    for (Artist a : artists){
+                        resultJson += " " + a.getName();
                     }
-                    finally {
-                        reader.close();
-                    }
-
-                    /* StringBuffer buffer = new StringBuffer();
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        buffer.append(line);
-                    }
-
-                    resultJson = buffer.toString();     */
                 }
-                catch (Exception e) {
-                    e.printStackTrace();
+                finally {
+                    reader.close();
                 }
-                return resultJson;
             }
-
-            /**
-             *  Формирует список исполнителей
-             */
-            public List readMessagesArray(JsonReader reader) throws IOException{
-                List messages = new ArrayList();
-
-                reader.beginArray();
-                while (reader.hasNext()){
-                    messages.add(readMessage(reader));
-                }
-                reader.endArray();
-                return messages;
+            catch (Exception e) {
+                e.printStackTrace();
             }
+            return resultJson;
+        }
 
-            /**
-             * Считывает инфо об одном исполнителе
-             */
-            public Artist readMessage(JsonReader reader) throws IOException {
-                long id = -1;
-                String name = null;
-                List style = null;    // func
-                int songs = -1;
-                int albums = -1;
-                String link = null;
-                String description = null;
-                String coverSmall = null;
-                String coverBig = null;
+        /**
+         *  Формирует список исполнителей
+         */
+        public List<Artist> readMessagesArray(JsonReader reader) throws IOException{
+            List messages = new ArrayList();
 
-                reader.beginObject();
-                while (reader.hasNext()){
-                    String key = reader.nextName();
-                    if (key.equals("id")){
-                        id = reader.nextLong();
-                    } else if (key.equals("name")){
-                        name = reader.nextString();
-                    } else if (key.equals("genres")){
-                        style = readStringArray(reader);
-                    } else if (key.equals("tracks")){
-                        songs = reader.nextInt();
-                    } else if (key.equals("albums")){
-                        albums = reader.nextInt();
-                    } else if (key.equals("link")){
-                        link = reader.nextString();
-                    } else if (key.equals("description")){
-                        description = reader.nextString();
-                    } else if (key.equals("cover")){
-                        String[] covers = readCovers(reader);
-                        coverSmall = covers[0];
-                        coverBig = covers[1];
-                    } else {
-                        reader.skipValue();
-                    }
-                    reader.endObject();
-                }
-                return new Artist(id, name, style, songs, albums, link, description, coverSmall, coverBig);
+            reader.beginArray();
+            while (reader.hasNext()){
+                messages.add(readMessage(reader));
             }
+            reader.endArray();
+            return messages;
+        }
 
-            /**
-             * Считывает стили исполнителя
-             */
-            public List readStringArray(JsonReader reader) throws IOException{
-                List strings = new ArrayList();
+        /**
+         * Считывает инфо об одном исполнителе
+         */
+        public Artist readMessage(JsonReader reader) throws IOException {
+            long id = -1;
+            String name = null;
+            List style = null;    // func
+            int songs = -1;
+            int albums = -1;
+            String link = null;
+            String description = null;
+            String coverSmall = null;
+            String coverBig = null;
 
-                reader.beginArray();
-                while (reader.hasNext()){
-                    strings.add(reader.nextString());
-                }
-                reader.endArray();
-                return strings;
-            }
-
-            /**
-             * Считывает обложки исполнителя
-             */
-            public String[] readCovers(JsonReader reader) throws IOException{
-                String[] covers = new String[2];
-
-                reader.beginObject();
-                while (reader.hasNext()){
-                    String key = reader.nextName();
-                    if (key.equals("small")){
-                        covers[0] = reader.nextString();
-                    } else if (key.equals("big")){
-                        covers[1] = reader.nextString();
-                    }
-                    else {
-                        reader.skipValue();
-                    }
+            reader.beginObject();
+            while (reader.hasNext()){
+                String key = reader.nextName();
+                if (key.equals("id")){
+                    id = reader.nextLong();
+                } else if (key.equals("name")){
+                    name = reader.nextString();
+                } else if (key.equals("genres")){
+                    style = readStringArray(reader);
+                } else if (key.equals("tracks")){
+                    songs = reader.nextInt();
+                } else if (key.equals("albums")){
+                    albums = reader.nextInt();
+                } else if (key.equals("link")){
+                    link = reader.nextString();
+                } else if (key.equals("description")){
+                    description = reader.nextString();
+                } else if (key.equals("cover")){
+                    String[] covers = readCovers(reader);
+                    coverSmall = covers[0];
+                    coverBig = covers[1];
+                } else {
+                    reader.skipValue();
                 }
                 reader.endObject();
-                return covers;
             }
+            return new Artist(id, name, style, songs, albums, link, description, coverSmall, coverBig);
+        }
 
+        /**
+         * Считывает стили исполнителя
+         */
+        public List readStringArray(JsonReader reader) throws IOException{
+            List strings = new ArrayList();
 
+            reader.beginArray();
+            while (reader.hasNext()){
+                strings.add(reader.nextString());
+            }
+            reader.endArray();
+            return strings;
+        }
+
+        /**
+         * Считывает обложки исполнителя
+         */
+        public String[] readCovers(JsonReader reader) throws IOException{
+            String[] covers = new String[2];
+
+            reader.beginObject();
+            while (reader.hasNext()){
+                String key = reader.nextName();
+                if (key.equals("small")){
+                    covers[0] = reader.nextString();
+                } else if (key.equals("big")){
+                    covers[1] = reader.nextString();
+                }
+                else {
+                    reader.skipValue();
+                }
+            }
+            reader.endObject();
+            return covers;
+        }
+
+        /**
+         * Выводит JSON данные в активити
+         */
+        protected void onPostExecute(String strJson){
 
         }
+
     }
+
 }
